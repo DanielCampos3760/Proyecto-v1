@@ -70,7 +70,17 @@
             <div id="hardware-tab" class="tab-content">
                 <section class="full-width">
                     <h2>Hardware Detectado</h2>
-                    <button class="sync-btn" onclick="syncHardware()">🔄 Sincronizar Hardware</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                        <input type="file" id="hardware-file-input" style="display: none;" accept=".json" onchange="handleFileUpload(event)">
+                        
+                        <button class="sync-btn" onclick="document.getElementById('hardware-file-input').click()">
+                            📂 Subir system_context.json
+                        </button>
+                        
+                        <button class="secondary-btn" style="margin-top:0" onclick="syncHardware()">
+                            🔄 Sincronizar Localmente
+                        </button>
+                    </div>
                     <div id="hardware-display" class="data-grid"></div>
                 </section>
             </div>
@@ -78,4 +88,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
