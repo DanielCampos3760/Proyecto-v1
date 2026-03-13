@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abraham's System Control</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="[https://cdn.jsdelivr.net/npm/marked/marked.min.js](https://cdn.jsdelivr.net/npm/marked/marked.min.js)"></script>
+</head>
+<body>
+    <div id="login-container" class="auth-box">
+        <h2>🧠 Abraham OS</h2>
+        <p>Identifícate para acceder</p>
+        <div class="input-group">
+            <input type="text" id="auth-username" placeholder="Usuario">
+            <input type="password" id="auth-password" placeholder="Contraseña">
+            <button onclick="loginUser()">Iniciar Sesión</button>
+            <button class="secondary-btn" onclick="registerUser()">Crear Cuenta</button>
+        </div>
+        <p id="auth-status" class="status-message"></p>
+    </div>
+
+    <div id="app-container" class="container" style="display: none;">
+        <header>
+            <div class="header-top">
+                <h1>System Control <span>AI Panel</span></h1>
+                <button class="logout-btn" onclick="logoutUser()">🚪 Cerrar Sesión</button>
+            </div>
+            <p id="welcome-message" class="subtitle"></p>
+            <nav class="tabs">
+                <button class="tab-btn active" onclick="openTab('profiles-tab')">🕒 Mi Historial</button>
+                <button class="tab-btn" onclick="openTab('ai-tab')">🧠 IA Configurator</button>
+                <button class="tab-btn" onclick="openTab('hardware-tab')">🖥️ Hardware & Sistema</button>
+            </nav>
+        </header>
+
+        <main>
+            <div id="profiles-tab" class="tab-content active">
+                <div class="chat-history-layout">
+                    <div class="sidebar-list">
+                        <h3 style="margin-top:0; color:var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom:10px;">🕒 Historial</h3>
+                        <div id="notes-display">Cargando...</div>
+                    </div>
+                    <div class="main-detail">
+                        <div id="welcome-history" style="text-align:center; color:#64748b; margin-top: 20%;">
+                            <p>👈 Selecciona un tema para ver su configuración limpia.</p>
+                        </div>
+                        <div id="profile-detail-view" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+                                <h2 id="detail-title" style="margin: 0;">Título</h2>
+                                <button id="detail-delete-btn" class="delete-btn" style="background: #ef4444; color: white; padding: 5px 15px; border-radius: 5px;">🗑️ Borrar</button>
+                            </div>
+                            <div id="detail-content" class="markdown-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ai-tab" class="tab-content">
+                <section class="full-width">
+                    <h2>Chat de Optimización</h2>
+                    <div class="input-group">
+                        <input type="text" id="ai-command" placeholder="Ej: Optimizar RAM...">
+                        <button onclick="processAICommand()">Ejecutar Análisis</button>
+                    </div>
+                    <div id="ai-status" class="status-box">Esperando comando...</div>
+                </section>
+            </div>
+
+            <div id="hardware-tab" class="tab-content">
+                <section class="full-width">
+                    <h2>Hardware Detectado</h2>
+                    <button class="sync-btn" onclick="syncHardware()">🔄 Sincronizar Hardware</button>
+                    <div id="hardware-display" class="data-grid"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
