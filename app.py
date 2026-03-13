@@ -78,21 +78,26 @@ def ask_ai():
         data = request.json
         command = data.get('command')
         username = data.get('username')
+        
+        # Buscamos el perfil del usuario
         user_profile = hardware_collection.find_one({"username": username})
-        hardware = user_profile.get("hardware", {}) if user_profile else {}
+        # Si no hay hardware, usamos un diccionario vacío para no romper el código
+        hardware = user_profile.get("hardware", {}) if user_profile and "hardware" in user_profile else {"Nota": "Hardware no detectado"}
 
-        prompt_text = f"Contexto Hardware: {json.dumps(hardware)}. Usuario dice: {command}. Responde en JSON con llaves: tema, explicacion (markdown), codigo_limpio."
+        prompt_text = f"Contexto Hardware: {json.dumps(hardware)}. Usuario dice: {command}. Responde únicamente en formato JSON con estas llaves: tema, explicacion (usa markdown), codigo_limpio."
 
         payload = {"contents": [{"parts": [{"text": prompt_text}]}]}
         response = requests.post(GEMINI_URL, json=payload, timeout=30)
         res_json = response.json()
         
+        # Extraemos el texto y limpiamos posibles bloques de código que ensucian el JSON
         ai_text = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
-        # Limpieza simple de bloques de código JSON si la IA los incluye
         ai_text = ai_text.replace('```json', '').replace('```', '').strip()
+        
         return jsonify({"status": "success", "data": json.loads(ai_text)})
     except Exception as e:
-        return jsonify({"status": "error", "response": str(e)}), 500
+        print(f"❌ Error en ask-ai: {e}") # Esto aparecerá en tus logs de Render
+        return jsonify({"status": "error", "response": "La IA tardó mucho o los datos son inválidos"}), 500
 
 @app.route('/save-profile', methods=['POST'])
 def save_profile():
@@ -116,4 +121,5 @@ def delete_profile():
 if __name__ == '__main__':
     # CRÍTICO: Render requiere que escuches en 0.0.0.0 y en el puerto de la variable PORT
     port = int(os.environ.get("PORT", 5000))
+
     app.run(host='0.0.0.0', port=port)
