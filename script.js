@@ -186,3 +186,32 @@ async function deleteProfileFromCloud(profileId) {
     fetchProfilesFromCloud();
 }
 
+async function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const hardwareData = JSON.parse(e.target.result);
+            
+            // Enviamos los datos al backend en Render
+            const response = await fetch(`${API_URL}/update-system-info`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: currentUser, hardware: hardwareData })
+            });
+
+            if (response.ok) {
+                localStorage.setItem('pc_context', JSON.stringify(hardwareData));
+                renderHardware();
+                alert("✅ ¡Hardware cargado y sincronizado con éxito!");
+            } else {
+                alert("❌ Error al subir los datos al servidor.");
+            }
+        } catch (err) {
+            alert("❌ El archivo no es un JSON válido. Asegúrate de usar el generado por el .ps1");
+        }
+    };
+    reader.readAsText(file);
+}
