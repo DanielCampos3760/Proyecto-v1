@@ -79,25 +79,40 @@ def ask_ai():
         command = data.get('command')
         username = data.get('username')
         
-        # Buscamos el perfil del usuario
+        # 1. Buscamos el hardware de forma segura
         user_profile = hardware_collection.find_one({"username": username})
-        # Si no hay hardware, usamos un diccionario vacío para no romper el código
-        hardware = user_profile.get("hardware", {}) if user_profile and "hardware" in user_profile else {"Nota": "Hardware no detectado"}
+        hardware = {}
+        if user_profile and "hardware" in user_profile:
+            hardware = user_profile["hardware"]
+        else:
+            hardware = {"informacion": "El usuario aun no ha sincronizado su hardware."}
 
-        prompt_text = f"Contexto Hardware: {json.dumps(hardware)}. Usuario dice: {command}. Responde únicamente en formato JSON con estas llaves: tema, explicacion (usa markdown), codigo_limpio."
+        # 2. Preparamos el prompt
+        prompt_text = f"Actúa como Abraham OS. Contexto Hardware: {json.dumps(hardware)}. El usuario pregunta: {command}. RESPONDE ÚNICAMENTE EN FORMATO JSON con estas llaves: tema, explicacion (usa markdown), codigo_limpio."
 
+        # 3. Llamada a Gemini
         payload = {"contents": [{"parts": [{"text": prompt_text}]}]}
         response = requests.post(GEMINI_URL, json=payload, timeout=30)
         res_json = response.json()
         
-        # Extraemos el texto y limpiamos posibles bloques de código que ensucian el JSON
-        ai_text = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
-        ai_text = ai_text.replace('```json', '').replace('```', '').strip()
+        # 4. Limpieza extrema del JSON de la IA
+        ai_raw_text = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
         
-        return jsonify({"status": "success", "data": json.loads(ai_text)})
+        # Eliminamos bloques markdown de código si la IA los pone (```json ... ```)
+        if ai_raw_text.startswith("```"):
+            ai_raw_text = ai_raw_text.split("json")[-1].split("```")[0].strip()
+        
+        return jsonify({"status": "success", "data": json.loads(ai_raw_text)})
+        
     except Exception as e:
-        print(f"❌ Error en ask-ai: {e}") # Esto aparecerá en tus logs de Render
-        return jsonify({"status": "error", "response": "La IA tardó mucho o los datos son inválidos"}), 500
+        print(f"❌ Error crítico en IA: {str(e)}")
+        # Respuesta de emergencia por si algo falla
+        fallback = {
+            "tema": "Error de Procesamiento",
+            "explicacion": "Lo siento, tuve un problema al analizar los datos. Por favor, asegúrate de haber subido tu archivo de hardware primero.",
+            "codigo_limpio": "N/A"
+        }
+        return jsonify({"status": "success", "data": fallback})
 
 @app.route('/save-profile', methods=['POST'])
 def save_profile():
@@ -123,3 +138,4 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
 
     app.run(host='0.0.0.0', port=port)
+
