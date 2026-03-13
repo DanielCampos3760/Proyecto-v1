@@ -1,7 +1,7 @@
 // Cambia 'tu-app-en-render.onrender.com' por la URL real que te dé Render
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:5000' 
-    : 'https://tu-app-en-render.onrender.com';
+    : 'https://abraham-os.onrender.com';
 
 let currentUser = localStorage.getItem('abraham_username');
 let currentAIResponse = null; 
@@ -92,11 +92,12 @@ async function fetchProfilesFromCloud() {
     const container = document.getElementById('notes-display');
     container.innerHTML = "⏳ Descargando perfiles desde MongoDB...";
     try {
-        const response = await fetch('http://localhost:5000/get-profiles', {
+        const response = await fetch(`${API_URL}/get-profiles`, { // ✅ CAMBIADO
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username: currentUser })
         });
+        
         const result = await response.json();
         
         if (result.profiles.length === 0) {
@@ -141,9 +142,9 @@ function closeProfileDetail() {
 }
 
 async function deleteProfileFromCloud(profileId) {
-    if(!confirm("¿Estás seguro de que quieres eliminar este perfil de la base de datos?")) return;
+    if(!confirm("¿Estás seguro?")) return;
     try {
-        const response = await fetch('http://localhost:5000/delete-profile', {
+        const response = await fetch(`${API_URL}/delete-profile`, { // ✅ CAMBIADO
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username: currentUser, profile_id: profileId })
@@ -153,5 +154,5 @@ async function deleteProfileFromCloud(profileId) {
             fetchProfilesFromCloud(); 
         }
     } catch (e) { alert("❌ Error al borrar el perfil."); }
-
 }
+
