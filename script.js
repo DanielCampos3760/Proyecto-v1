@@ -1,6 +1,4 @@
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:5000' 
-    : 'https://abraham-os.onrender.com';
+const API_URL = 'https://abraham-os.onrender.com'; // Debe ser HTTPS
 
 let currentUser = localStorage.getItem('abraham_username');
 let currentAIResponse = null; 
@@ -184,3 +182,4 @@ async function saveProfileToCloud() {
     alert("Guardado!");
     fetchProfilesFromCloud();
 }
+
