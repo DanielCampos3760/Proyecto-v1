@@ -1,6 +1,6 @@
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'http://localhost:5000' 
-    : 'https://abraham-os.onrender.com';
+    : 'https://abraham-os.onrender.com'; // La URL de tu Web Service
 
 let currentUser = localStorage.getItem('abraham_username');
 let currentAIResponse = null; 
@@ -185,3 +185,4 @@ async function deleteProfileFromCloud(profileId) {
     document.getElementById('welcome-history').style.display = 'block';
     fetchProfilesFromCloud();
 }
+
